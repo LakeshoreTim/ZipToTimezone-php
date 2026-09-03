@@ -19,7 +19,7 @@ composer require LakeshoreTim/ZipToTimezone-php
 ## Example
 
 ```php
-use LakeshoreTim\\ZipToTimezonePhp\ZipAndTimeZones;
+use LakeshoreTim\ZipToTimezonePhp\ZipAndTimeZones;
 
 // Get the TimeZone "name" from a given zip code
 $input  = "60606";
@@ -33,7 +33,7 @@ echo "The Standard Time offset for " .$input. " is " .$output;
 
 // Get the time zone offset from UTC from a given zip code (Daylight Savings Time)
 $input  = "86023";
-$output = ZipAndTimeZones::getStandardTimeOffset ($input)
+$output = ZipAndTimeZones::getDSTOffset ($input)
 echo "The Daylight Savings Time offset for " .$input. " is " .$output;
 
 ```
