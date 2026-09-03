@@ -1,0 +1,33 @@
+{
+	"name": "LakeshoreTim/ZipToTimezone-php",
+	"description": "Convert Zip Codes to Time Zones",
+	"type": "library",
+	"keywords": [
+		"zip code",
+		"zipcode",
+		"time zone",
+		"timezone",
+		"standard time",
+		"daylight savings time"
+	],
+	"license": "MIT",
+	"authors": [
+	{
+		"name": "Tim Lambert",
+		"email": "tim@lakeshoreky.com"
+	}
+	],
+	"require": {
+		"php": ">=7.0",
+	},
+	"autoload": {
+		"psr-4": {
+			"LakeshoreTim\\ZipToTimezonePhp\\": "src/"
+	},
+		"classmap": [
+			"src/ZipAndTimeZones.php"
+		]
+	},
+	"minimum-stability": "stable",
+	"prefer-stable": true
+}
