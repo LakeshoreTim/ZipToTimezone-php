@@ -1,6 +1,7 @@
-<?php 
+<?php
+// Copyright (c) 2026 Tim Lambert — MIT License. See LICENSE file for details.
 
-namespace ZipToTimezonePhp;
+namespace LakeshoreTim\ZipToTimezonePhp;
 
 /**
  * A class for converting zip codes to timezones. It is used statically.
