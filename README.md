@@ -13,7 +13,7 @@ PHP SDK for [ZipToTimezone] - convert zip codes to time zones.
 ## Installation
 
 ```bash
-composer require LakeshoreTim/ZipToTimezone-php
+composer require lakeshoretim/ziptotimezone-php
 ```
 
 ## Example
