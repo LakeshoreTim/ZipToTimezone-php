@@ -38,6 +38,16 @@ echo "The Daylight Savings Time offset for " .$input. " is " .$output;
 
 ```
 
+## Staying in Sync with IANA Time Zone Data
+
+Time zone rules aren't static — Daylight Saving Time observance and UTC
+offsets occasionally change at the government level. This library's data
+is checked against [IANA's tzdata](https://github.com/eggert/tz) (the
+canonical time zone database used by most operating systems and
+programming languages) via an automated process that watches for new
+releases mentioning any of the 25 zones this library covers, so that a
+real-world rule change doesn't go unnoticed.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file.
