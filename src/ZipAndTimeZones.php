@@ -5,8 +5,12 @@ namespace LakeshoreTim\ZipToTimezonePhp;
 
 /**
  * A class for converting zip codes to timezones. It is used statically.
+ *
+ * Zone metadata (IANA name, Standard Time offset, DST-observance flag)
+ * lives in one central TZ_META table below, mirroring the structure used
+ * by the Node.js and Python ports of this library. Zip-code lookup
+ * (getTimezoneFromRanges / getTimezoneFromSingles) is unchanged.
  */
- 
 class ZipAndTimeZones
 {
 	/**
@@ -48,38 +52,11 @@ class ZipAndTimeZones
 	public static function getDSTOffset ($zipCode)
 	{
 		$tzCode = self::findTzCode ($zipCode);
-		
-		switch ($tzCode) {
-			// all but the last 2 are a single hour offset from Standard Time
-			//case self::ANCHORAGE:
-			//case self::BOISE:
-			//case self::CHICAGO:
-			//case self::DENVER:
-			//case self::DETROIT:
-			//case self::INDIANAPOLIS:
-			//case self::KNOX:
-			//case self::MARENGO:
-			//case self::PETERSBURG:
-			//case self::TELL_CITY:
-			//case self::VEVAY:
-			//case self::VINCENNES:
-			//case self::WINAMAC:
-			//case self::JUNEAU:
-			//case self::MONTICELLO:
-			//case self::LOS_ANGELES:
-			//case self::MENOMINEE:
-			//case self::NEW_YORK:
-			//case self::NOME:
-			//case self::NORTH_DAKOTA:
-			//case self::SHIPROCK:
-			//case self::YAKUTAT:
-			
-			case self::PHOENIX:
-			case self::HONOLULU:
-				return self::getStandardFromTzCode ($tzCode);
+		$meta = self::TZ_META[$tzCode] ?? null;
+		if ($meta === null) {
+			return 0;
 		}
-		
-		return self::getStandardFromTzCode ($tzCode) + 1;
+		return $meta['observesDst'] ? $meta['standardOffset'] + 1 : $meta['standardOffset'];
 	}
 	
 	// ------------------------------------------------------------------------------------------------
@@ -116,37 +93,43 @@ class ZipAndTimeZones
    const LAST_CODE   	= 25;
 
 	// --------------------------------------------------------------------------------------------
-	
+
+	/**
+	 * Central metadata table: IANA name, Standard Time UTC offset (hours),
+	 * and whether the zone observes DST. Replaces what used to be two
+	 * separate switch statements (getTimezoneName / getStandardFromTzCode).
+	 */
+	private const TZ_META = [
+        self::ANCHORAGE	=> ['name' => 'America/Anchorage', 'standardOffset' => -9, 'observesDst' => true],
+        self::BOISE	=> ['name' => 'America/Boise', 'standardOffset' => -7, 'observesDst' => true],
+        self::CHICAGO	=> ['name' => 'America/Chicago', 'standardOffset' => -6, 'observesDst' => true],
+        self::DENVER	=> ['name' => 'America/Denver', 'standardOffset' => -7, 'observesDst' => true],
+        self::DETROIT	=> ['name' => 'America/Detroit', 'standardOffset' => -5, 'observesDst' => true],
+        self::INDIANAPOLIS	=> ['name' => 'America/Indiana/Indianapolis', 'standardOffset' => -5, 'observesDst' => true],
+        self::KNOX	=> ['name' => 'America/Indiana/Knox', 'standardOffset' => -6, 'observesDst' => true],
+        self::MARENGO	=> ['name' => 'America/Indiana/Marengo', 'standardOffset' => -5, 'observesDst' => true],
+        self::PETERSBURG	=> ['name' => 'America/Indiana/Petersburg', 'standardOffset' => -5, 'observesDst' => true],
+        self::TELL_CITY	=> ['name' => 'America/Indiana/Tell_City', 'standardOffset' => -6, 'observesDst' => true],
+        self::VEVAY	=> ['name' => 'America/Indiana/Vevay', 'standardOffset' => -5, 'observesDst' => true],
+        self::VINCENNES	=> ['name' => 'America/Indiana/Vincennes', 'standardOffset' => -5, 'observesDst' => true],
+        self::WINAMAC	=> ['name' => 'America/Indiana/Winamac', 'standardOffset' => -5, 'observesDst' => true],
+        self::JUNEAU	=> ['name' => 'America/Juneau', 'standardOffset' => -9, 'observesDst' => true],
+        self::LOUISVILLE	=> ['name' => 'America/Kentucky/Louisville', 'standardOffset' => -5, 'observesDst' => true],
+        self::MONTICELLO	=> ['name' => 'America/Kentucky/Monticello', 'standardOffset' => -5, 'observesDst' => true],
+        self::LOS_ANGELES	=> ['name' => 'America/Los_Angeles', 'standardOffset' => -8, 'observesDst' => true],
+        self::MENOMINEE	=> ['name' => 'America/Menominee', 'standardOffset' => -6, 'observesDst' => true],
+        self::NEW_YORK	=> ['name' => 'America/New_York', 'standardOffset' => -5, 'observesDst' => true],
+        self::NOME	=> ['name' => 'America/Nome', 'standardOffset' => -9, 'observesDst' => true],
+        self::NORTH_DAKOTA	=> ['name' => 'America/North_Dakota/Center', 'standardOffset' => -6, 'observesDst' => true],
+        self::PHOENIX	=> ['name' => 'America/Phoenix', 'standardOffset' => -7, 'observesDst' => false],
+        self::SHIPROCK	=> ['name' => 'America/Shiprock', 'standardOffset' => -7, 'observesDst' => true],
+        self::YAKUTAT	=> ['name' => 'America/Yakutat', 'standardOffset' => -9, 'observesDst' => true],
+        self::HONOLULU	=> ['name' => 'Pacific/Honolulu', 'standardOffset' => -10, 'observesDst' => false],
+	];
+
 	protected static function getTimezoneName ($tzCode)
 	{
-		switch ($tzCode) {
-			case self::ANCHORAGE   		: return "America/Anchorage";
-			case self::BOISE   			: return "America/Boise";
-			case self::CHICAGO   		: return "America/Chicago";
-			case self::DENVER   			: return "America/Denver";
-			case self::DETROIT   		: return "America/Detroit";
-			case self::INDIANAPOLIS   	: return "America/Indiana/Indianapolis";
-			case self::KNOX   			: return "America/Indiana/Knox";
-			case self::MARENGO   		: return "America/Indiana/Marengo";
-			case self::PETERSBURG   	: return "America/Indiana/Petersburg";
-			case self::TELL_CITY   		: return "America/Indiana/Tell_City";
-			case self::VEVAY   			: return "America/Indiana/Vevay";
-			case self::VINCENNES   		: return "America/Indiana/Vincennes";
-			case self::WINAMAC  	 		: return "America/Indiana/Winamac";
-			case self::JUNEAU   			: return "America/Juneau";
-			case self::LOUISVILLE   	: return "America/Kentucky/Louisville";
-			case self::MONTICELLO   	: return "America/Kentucky/Monticello";
-			case self::LOS_ANGELES 		: return "America/Los_Angeles";
-			case self::MENOMINEE   		: return "America/Menominee";
-			case self::NEW_YORK		   : return "America/New_York";
-			case self::NOME   			: return "America/Nome";
-			case self::NORTH_DAKOTA   	: return "America/North_Dakota/Center";
-			case self::PHOENIX   		: return "America/Phoenix";
-			case self::SHIPROCK   		: return "America/Shiprock";
-			case self::YAKUTAT   		: return "America/Yakutat";
-			case self::HONOLULU   		: return "Pacific/Honolulu";
-		}
-		return "unknown";
+		return self::TZ_META[$tzCode]['name'] ?? "unknown";
 	}
 	
 	public static function findTzCode ($zipCode)
@@ -167,38 +150,11 @@ class ZipAndTimeZones
 	
 	protected static function getStandardFromTzCode ($tzCode)
 	{
-		switch ($tzCode) {
-			case self::ANCHORAGE   		: return -9;
-			case self::BOISE   			: return -7;
-			case self::CHICAGO   		: return -6;
-			case self::DENVER   			: return -7;
-			case self::DETROIT   		: return -5;
-			case self::INDIANAPOLIS   	: return -5;
-			case self::KNOX   			: return -6;
-			case self::MARENGO   		: return -5;
-			case self::PETERSBURG   	: return -5;
-			case self::TELL_CITY   		: return -6;
-			case self::VEVAY   			: return -5;
-			case self::VINCENNES   		: return -5;
-			case self::WINAMAC  	 		: return -5;
-			case self::JUNEAU   			: return -9;
-			case self::LOUISVILLE   	: return -5;
-			case self::MONTICELLO   	: return -5;
-			case self::LOS_ANGELES 		: return -8;
-			case self::MENOMINEE   		: return -6;
-			case self::NEW_YORK		   : return -5;
-			case self::NOME   			: return -9;
-			case self::NORTH_DAKOTA   	: return -6;
-			case self::PHOENIX   		: return -7;
-			case self::SHIPROCK   		: return -7;
-			case self::YAKUTAT   		: return -9;
-			case self::HONOLULU   		: return -10;
-		}
-		return 0;
+		return self::TZ_META[$tzCode]['standardOffset'] ?? 0;
 	}
 	
 	
-	protected static function getTimezoneFromRanges ($zipCode)
+protected static function getTimezoneFromRanges ($zipCode)
 	{
 		if ($zipCode >= 99501  &&  $zipCode <= 99553)
 			return self::ANCHORAGE;
@@ -854,7 +810,7 @@ class ZipAndTimeZones
 		return self::UNKNOWN;
 	}
 	
-	protected static function getTimezoneFromSingles ($zipCode)
+protected static function getTimezoneFromSingles ($zipCode)
 	{
 		switch ($zipCode) {
 			case 99583:
@@ -1876,5 +1832,4 @@ class ZipAndTimeZones
 		}
 		return self::UNKNOWN;
 	}
-
 }
